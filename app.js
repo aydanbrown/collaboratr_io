@@ -33,6 +33,15 @@ io.on('connection', function (socket) {
     console.log(data);
     updateScript(data);
   });
+  socket.on('update object', function(data){
+    updateScript(data);
+  });
+  socket.on('add object', function(data){
+    addObject(data);
+  });
+  socket.on('remove object', function(data){
+    updateScript(data);
+  });
 });
 
 function updateScript(update){
