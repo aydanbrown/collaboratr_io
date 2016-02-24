@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="codemirror.js"></script>
+	<link rel="stylesheet" href="codemirror.css">
+	<script type="text/javascript" src="mode/javascript/javascript.js"></script>
+	<style type="text/css">
+		.CodeMirror {border: 1px solid #aaa;}
+	</style>
+</head>
+<body>
+<script type="text/javascript" src="node-manager.js"></script>
+<script type="text/javascript">
+
+var nodeManager = new NodeManager();
+
+var nodes = [];
+
+var doc = CodeMirror(document.body, {
+	value: '',
+	mode:  "javascript",
+	lineNumbers: true
+});
+
+doc.on("change", function(param1, chg){
+  /*
+	console.log(param2);
+	var t = param2.text;
+	var ln = param2.from.line;
+	var ch = param2.from.ch;
+	console.log(nodes[ln][3].length, ch);
+	if(ch >= nodes[ln][3].length) console.log('end line');
+	if(t.length > 1){
+		console.log(t);
+		if(t[0] == '\n') console.log('0 = enter');
+		if(t[1] == '\n') console.log('1 = enter');
+	}
+  */
+  console.log(nodes);
+  console.log(chg);
+  //nodeManager.onCodeChange(param2);
+  //nodeManager.onCodeChange(chg);
+  //console.log(nodeManager.nodes);
+});
+
+function generateNodesFromText(text){
+  var nds = [];
+  var nd = [];
+  var line = 0;
+  var ch = 0;
+  var newLine = true;
+  nd = ['l0', null, null, []];
+  for(t in text){
+    if(text[t] == '\n'){
+      line++;
+      nd[2] = 'l' + line;
+      nds.push(nd);
+      nd = ['l' + line, 'l' + (line - 1), null, []];
+      newLine = true;
+    }else{
+      var c = 'c' + (ch - 1);
+      if(newLine){
+        c = null;
+        newLine = false;
+      }else{
+        nd[3][nd[3].length - 1][2] = 'c' + ch;
+      }
+      nd[3].push(['c' + ch, c, null, text[t]]);
+      ch++;
+    }
+  }
+  nds.push(nd);
+  return nds;
+}
+
+function generateTextFromNodes(nds){
+  var t = '';
+  for(l in nds){
+    if(t != ''){
+      t += '\n';
+    }
+    for(c in nds[l][3]){
+      t += nds[l][3][c][3];
+    }
+  }
+  return t;
+}
+var token = 'a';
+var changeCount = 0;
+
+function generateID(){
+  return token + (++changeCount);
+}
+
+var txt = 'var name = "aydan";\nname = "Ganjasaurus";\nname = "Good bitch";';
+nodes = generateNodesFromText(txt);
+//nodeManager.nodes = generateNodesFromText(txt);
+console.log(nodes);
+//var textFromNode = nodeManager.generateTextFromNodes(nodes);
+var textFromNode = generateTextFromNodes(nodes);
+console.log(textFromNode);
+doc.setValue(textFromNode);
+//console.log(JSON.stringify(generateNodesFromText('var name = "aydan";\nname = "Ganjasaurus";\nname = "Good bitch";')));
+
+var arr = [1,2,3,4,5,6,7,8,9];
+var arr2 = arr.splice(3);
+console.log(arr);
+console.log(arr2);
+
+
+</script>
+</body>
+</html>

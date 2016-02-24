@@ -1,14 +1,13 @@
 var app = require('http').createServer(handler)
-var io = require('socket.io')(app);
 var fs = require('fs');
 
-app.listen(80, function(){
-  console.log("listening on port 80");
+app.listen(420, function(){
+  console.log("listening on port 420");
 });
 
 function handler (req, res) {
   console.log(req.url);
-  if(req.url == '/') req.url = '/index.html';
+  if(req.url == '/') req.url = '/public/index.html';
   fs.readFile(__dirname + req.url,
   function (err, data) {
     if (err) {
@@ -21,31 +20,8 @@ function handler (req, res) {
   });
 }
 
-var sockets = [];
+var sockets = require('./socket-handler.js');
+sockets.initialize(app);
 
-io.on('connection', function (socket) {
-  sockets.push(socket);
-  //socket.emit('news', { hello: 'world' });
-  socket.on('user connect', function (data) {
-    console.log(data);
-  });
-  socket.on('update script', function (data) {
-    console.log(data);
-    updateScript(data);
-  });
-  socket.on('update object', function(data){
-    updateScript(data);
-  });
-  socket.on('add object', function(data){
-    addObject(data);
-  });
-  socket.on('remove object', function(data){
-    updateScript(data);
-  });
-});
 
-function updateScript(update){
-  for(s in sockets){
-    sockets[s].emit('update', update);
-  }
-}
+
